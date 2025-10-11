@@ -6,8 +6,8 @@
 		"email": "futami16237@gmail.com"
 	},
 	"purpose": "npm",
-	"description": "JSON is too simple, not enough for flexible data. So try json-script! Stringify and parse plain js objects as what they look like in the js files. 0 dependency. ",
-	"description_zh": "JSON还是太简单了，不够灵活。所以试试json-script吧！把js对象序列化成和js文件里一样的样子，然后再解析回来！0依赖",
+	"description": "JSON is too simple, not enough for flexible data. So try pseudo-json! Stringify and parse plain js objects as what they look like in the js files. 0 dependency. ",
+	"description_zh": "JSON还是太简单了，不够灵活。所以试试pseudo-json吧！把js对象序列化成和js文件里一样的样子，然后再解析回来！0依赖",
 	"type": "module",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
@@ -19,10 +19,10 @@
 	"files": [
 		"dist"
 	],
-	"homepage": "https://github.com/baendlorel/json-script#readme",
+	"homepage": "https://github.com/baendlorel/pseudo-json#readme",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/baendlorel/json-script"
+		"url": "https://github.com/baendlorel/pseudo-json"
 	},
 	"keywords": [
 		"json",
