@@ -1,6 +1,3 @@
-export const $ownKeys = Reflect.ownKeys;
-export const $get = Reflect.get;
-
 export function $stringifySymbol(value: symbol): string {
   if (!Symbol.keyFor(value)) {
     return `Symbol.for(${JSON.stringify(value.description)})`;
