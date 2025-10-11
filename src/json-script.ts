@@ -1,11 +1,14 @@
 import { $jsonStringify, $fnToString, $ownKeys, $get, $isArray } from './lib/native.js';
 
 /**
- * JsonScript - A creative class for stringifying JavaScript values to their literal representation
+ * ## JSONScript
+ * A creative class for stringifying JavaScript values to their literal representation
  *
  * Preserves special values like `NaN`, `undefined`, `Infinity`, `Symbol`, etc.
+ *
+ * __PKG_INFO__
  */
-export class JsonScript {
+export class JSONScript {
   private readonly _indent: string;
   private readonly _exists = new Set<object>();
 
@@ -177,7 +180,7 @@ export class JsonScript {
    * @throws when code has syntax error or it's broken
    */
   parse<T extends any = any>(code: string): T {
-    const cleaned = code.replace(/[\s]+export default[\s]+/, '');
+    const cleaned = code.replace(/(\s)*(export default|module.exports)[\s]+/, '');
     return Function(`"use strict"; return (${cleaned})`)();
   }
 }
