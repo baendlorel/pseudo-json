@@ -1,9 +1,6 @@
 pnpm add -D \
  prettier \
- @babel/plugin-proposal-decorators \
- @babel/preset-env \
  @rollup/plugin-alias \
- @rollup/plugin-babel \
  @rollup/plugin-commonjs \
  @rollup/plugin-node-resolve \
  @rollup/plugin-replace \
@@ -13,7 +10,6 @@ pnpm add -D \
  rimraf \
  rollup \
  rollup-plugin-dts \
- rollup-plugin-dts-merger \
  tslib \
  typescript \
  @vitest/coverage-v8 \

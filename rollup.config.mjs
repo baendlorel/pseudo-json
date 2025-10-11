@@ -8,10 +8,8 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import alias from '@rollup/plugin-alias';
 import terser from '@rollup/plugin-terser';
-import babel from '@rollup/plugin-babel';
 import replace from '@rollup/plugin-replace';
 import dts from 'rollup-plugin-dts';
-import dtsMerger from 'rollup-plugin-dts-merger';
 import funcMacro from 'rollup-plugin-func-macro';
 import constEnum from 'rollup-plugin-const-enum';
 
@@ -51,11 +49,6 @@ const options = [
         format: 'esm',
         sourcemap: false,
       },
-      {
-        file: 'dist/index.cjs',
-        format: 'commonjs',
-        sourcemap: false,
-      },
     ],
 
     plugins: [
@@ -71,19 +64,6 @@ const options = [
       resolve(),
       commonjs(),
       typescript({ tsconfig }),
-      babel({
-        babelHelpers: 'bundled',
-        extensions: ['.ts', '.tsx', '.js', '.jsx'],
-        presets: [['@babel/preset-env', { targets: { node: '14' } }]],
-        plugins: [
-          [
-            '@babel/plugin-proposal-decorators',
-            {
-              version: '2023-11',
-            },
-          ],
-        ],
-      }),
       terser({
         format: {
           comments: false, // remove comments
@@ -111,13 +91,7 @@ const options = [
 const declaration = {
   input: 'src/index.ts',
   output: [{ file: 'dist/index.d.ts', format: 'es' }],
-  plugins: [
-    alias(aliasOpts),
-    replace(replaceOpts),
-    dts({ tsconfig }),
-    //& dts-merger:2.0.0 is different from 1.3.0
-    dtsMerger({ replace: { ...replaceOpts.values, ...replaceLiteralOpts } }),
-  ],
+  plugins: [alias(aliasOpts), replace(replaceOpts), dts({ tsconfig })],
 };
 
 /**

@@ -1,32 +1,35 @@
 {
-	"name": "<name>",
+	"name": "json-script",
 	"version": "0.0.1",
 	"author": {
 		"name": "Kasukabe Tsumugi",
 		"email": "futami16237@gmail.com"
 	},
-	"purpose": "<npm|app|vscode-extension|plugin|rollup-plugin>",
-	"description": "<name>",
-	"description_zh": "<name>",
+	"purpose": "npm",
+	"description": "JSON is too simple, not enough for flexible data. So try json-script! Stringify and parse plain js objects as what they look like in the js files. 0 dependency. ",
+	"description_zh": "JSON还是太简单了，不够灵活。所以试试json-script吧！把js对象序列化成和js文件里一样的样子，然后再解析回来！0依赖",
 	"type": "module",
-	"main": "./dist/index.cjs",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
 	"exports": {
 		"types": "./dist/index.d.ts",
 		"import": "./dist/index.mjs",
-		"require": "./dist/index.cjs",
 		"default": "./dist/index.mjs"
 	},
 	"files": [
 		"dist"
 	],
-	"homepage": "https://github.com/baendlorel/<name>#readme",
+	"homepage": "https://github.com/baendlorel/json-script#readme",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/baendlorel/<name>"
+		"url": "https://github.com/baendlorel/json-script"
 	},
 	"keywords": [
+		"json",
+		"serialize",
+		"deserialize",
+		"stringify",
+		"parse",
 		"typescript",
 		"javascript"
 	],
@@ -37,5 +40,26 @@
 		"cover": "clear & vitest --coverage",
 		"build": "tsx ./.scripts/rollup.ts"
 	},
-	"license": "MIT"
+	"license": "MIT",
+	"devDependencies": {
+		"@rollup/plugin-alias": "^5.1.1",
+		"@rollup/plugin-commonjs": "^28.0.6",
+		"@rollup/plugin-node-resolve": "^16.0.2",
+		"@rollup/plugin-replace": "^6.0.2",
+		"@rollup/plugin-terser": "^0.4.4",
+		"@rollup/plugin-typescript": "^12.1.4",
+		"@types/node": "^24.7.1",
+		"@vitest/coverage-v8": "^3.2.4",
+		"oxlint": "^1.22.0",
+		"prettier": "^3.6.2",
+		"rimraf": "^6.0.1",
+		"rollup": "^4.52.4",
+		"rollup-plugin-conditional-compilation": "^1.0.6",
+		"rollup-plugin-const-enum": "^1.1.4",
+		"rollup-plugin-dts": "^6.2.3",
+		"rollup-plugin-func-macro": "^1.1.1",
+		"tslib": "^2.8.1",
+		"typescript": "^5.9.3",
+		"vitest": "^3.2.4"
+	}
 }
