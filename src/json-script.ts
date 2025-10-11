@@ -1,4 +1,3 @@
-import { $stringifySymbol } from './lib/common.js';
 import { $jsonStringify, $fnToString, $ownKeys, $get } from './lib/native.js';
 
 /**
@@ -15,10 +14,40 @@ export class JsonScript {
     this.indent = typeof indent === 'number' ? ' '.repeat(indent) : indent || '';
   }
 
+  private _set(value: Set<any>, currentIndent: string): string {
+    const vars: string[] = [];
+    for (const item of value) {
+      vars.push(this._stringify(item, currentIndent));
+    }
+    return `new Set([${vars.join(', ')}])`;
+  }
+
+  private _map(value: Map<any, any>, currentIndent: string): string {
+    const vars: string[] = [];
+    for (const [key, val] of value) {
+      vars.push(`[${this._stringify(key, currentIndent)}, ${this._stringify(val, currentIndent)}]`);
+    }
+    return `new Map([${vars.join(', ')}])`;
+  }
+
+  /**
+   * stringify a symbol and keep its description
+   */
+  private _symbol(value: symbol): string {
+    if (!Symbol.keyFor(value)) {
+      return `Symbol.for(${JSON.stringify(value.description)})`;
+    }
+
+    if (value.description === undefined) {
+      return 'Symbol()';
+    } else {
+      return `Symbol(${JSON.stringify(value.description)})`;
+    }
+  }
+
   private _stringify(value: unknown, currentIndent = ''): string {
     const nextIndent = currentIndent + this.indent;
 
-    // Handle primitives and special values
     if (value === null) {
       return 'null';
     }
@@ -45,7 +74,7 @@ export class JsonScript {
       case 'function':
         return $fnToString.call(value);
       case 'symbol':
-        return $stringifySymbol(value);
+        return this._symbol(value);
       case 'object':
         if (this.exists.has(value)) {
           throw new TypeError('cyclic object value');
@@ -55,17 +84,22 @@ export class JsonScript {
         break;
     }
 
-    // Handle Date objects
     if (value instanceof Date) {
       return `new Date(${value.getTime()})`;
     }
 
-    // Handle RegExp objects
     if (value instanceof RegExp) {
       return value.toString();
     }
 
-    // Handle Arrays
+    if (value instanceof Map) {
+      return this._map(value, currentIndent);
+    }
+
+    if (value instanceof Set) {
+      return this._set(value, currentIndent);
+    }
+
     if (Array.isArray(value)) {
       if (value.length === 0) {
         return '[]';
@@ -80,7 +114,6 @@ export class JsonScript {
       return `[\n${nextIndent}${items.join(`,\n${nextIndent}`)}\n${currentIndent}]`;
     }
 
-    // Handle Objects
     const keys = $ownKeys(value);
 
     if (keys.length === 0) {
@@ -89,7 +122,7 @@ export class JsonScript {
 
     const pairs = keys.map((key: string | symbol | number) => {
       const val = $get(value, key as any);
-      const keyStr = typeof key === 'string' ? key : `[${$stringifySymbol(key as symbol)}]`;
+      const keyStr = typeof key === 'string' ? key : `[${this._symbol(key as symbol)}]`;
       const valueStr = this.stringify(val, nextIndent);
       return `${keyStr}: ${valueStr}`;
     });
