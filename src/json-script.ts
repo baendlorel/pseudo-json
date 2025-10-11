@@ -9,7 +9,9 @@ import { $jsonStringify, $fnToString, $ownKeys, $get, $isArray } from './lib/nat
  * __PKG_INFO__
  */
 export class JSONScript {
+  /** @internal */
   private readonly _indent: string;
+  /** @internal */
   private readonly _exists = new Set<object>();
 
   constructor(options?: { indent?: string | number }) {
@@ -17,6 +19,7 @@ export class JSONScript {
     this._indent = typeof indent === 'number' ? ' '.repeat(indent) : indent || '';
   }
 
+  /** @internal */
   private _set(value: Set<any>, currentIndent: string): string {
     const vars: string[] = [];
     for (const item of value) {
@@ -25,6 +28,7 @@ export class JSONScript {
     return `new Set([${vars.join(', ')}])`;
   }
 
+  /** @internal */
   private _map(value: Map<any, any>, currentIndent: string): string {
     const vars: string[] = [];
     for (const [key, val] of value) {
@@ -35,6 +39,7 @@ export class JSONScript {
 
   /**
    * stringify a symbol and keep its description
+   * @internal
    */
   private _symbol(value: symbol): string {
     if (Symbol.keyFor(value)) {
@@ -48,6 +53,7 @@ export class JSONScript {
     }
   }
 
+  /** @internal */
   private _cyclic(value: object) {
     if (this._exists.has(value)) {
       throw new TypeError('cyclic object value');
@@ -55,6 +61,7 @@ export class JSONScript {
     this._exists.add(value);
   }
 
+  /** @internal */
   private _stringify(value: unknown, currentIndent = ''): string {
     const nextIndent = currentIndent + this._indent;
 
@@ -149,11 +156,15 @@ export class JSONScript {
   }
 
   /**
-   * Convert a JavaScript value to its literal string representation
-   * - basically returns what they look like in a .js file
-   * - keeps special values like `NaN`, `undefined`, `Infinity`, `Symbol`, etc.
-   * - distinguishes global symbols and local symbols
+   * Convert a JavaScript value to its literal string representation, basically returns what they look like in a .js file
+   *
    * - will not preserve custom properties on Function, Date, RegExp, etc.
+   * - keeps special values like `NaN`, `undefined`, `Infinity`, `Symbol`, etc.
+   * - `symbol`: distinguishes global symbols and local symbols
+   * - `Error`: preserve `name` and `stack`.
+   * - `Map`/`Set`: preserve entries, and entries are also stringified.
+   * - `Date`: only preserve the evaluated date value. So it won't give `new Date()` but `new Date(1700929823)`
+   *
    * @param value The value to stringify
    * @returns String representation of the value
    */

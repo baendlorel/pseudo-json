@@ -3,6 +3,7 @@
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "stripInternal": true,
     "resolveJsonModule": false,
     "resolvePackageJsonImports": true,
     "declaration": false
