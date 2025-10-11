@@ -202,28 +202,7 @@ stringify(value: unknown, currentIndent = ''): string {
 
 ---
 
-## 性能优化建议
-
-### 1. **缓存 Symbol 字符串化结果**
-
-Symbol 的字符串化是固定的，可以用 `WeakMap` 或全局 `Map` 缓存（类似之前实现的 `stringifySymbol`）。
-
-### 2. **避免字符串重复拼接**
-
-在大对象序列化时，使用数组 + `join` 而不是字符串 `+=` 拼接，可以提升性能（当前代码已经在用 `join`，很好）。
-
-### 3. **`indent` 字段可以是 `readonly`**
-
-已经是 `readonly`，很好。
-
----
-
 ## 代码风格建议
-
-### 1. **命名一致性**
-
-- 类中用 `_stringify`、`_symbol` 等下划线开头表示私有方法，很好
-- 但 `exists` Set 没有下划线前缀，建议改为 `_exists` 保持一致
 
 ### 2. **类型标注**
 

@@ -1,4 +1,4 @@
-import { $jsonStringify, $fnToString, $ownKeys, $get } from './lib/native.js';
+import { $jsonStringify, $fnToString, $ownKeys, $get, $isArray } from './lib/native.js';
 
 /**
  * JsonScript - A creative class for stringifying JavaScript values to their literal representation
@@ -6,12 +6,12 @@ import { $jsonStringify, $fnToString, $ownKeys, $get } from './lib/native.js';
  * Preserves special values like `NaN`, `undefined`, `Infinity`, `Symbol`, etc.
  */
 export class JsonScript {
-  private readonly indent: string;
-  private readonly exists = new Set<object>();
+  private readonly _indent: string;
+  private readonly _exists = new Set<object>();
 
   constructor(options?: { indent?: string | number }) {
     const indent = options?.indent ?? '';
-    this.indent = typeof indent === 'number' ? ' '.repeat(indent) : indent || '';
+    this._indent = typeof indent === 'number' ? ' '.repeat(indent) : indent || '';
   }
 
   private _set(value: Set<any>, currentIndent: string): string {
@@ -34,7 +34,7 @@ export class JsonScript {
    * stringify a symbol and keep its description
    */
   private _symbol(value: symbol): string {
-    if (!Symbol.keyFor(value)) {
+    if (Symbol.keyFor(value)) {
       return `Symbol.for(${JSON.stringify(value.description)})`;
     }
 
@@ -45,8 +45,15 @@ export class JsonScript {
     }
   }
 
+  private _cyclic(value: object) {
+    if (this._exists.has(value)) {
+      throw new TypeError('cyclic object value');
+    }
+    this._exists.add(value);
+  }
+
   private _stringify(value: unknown, currentIndent = ''): string {
-    const nextIndent = currentIndent + this.indent;
+    const nextIndent = currentIndent + this._indent;
 
     if (value === null) {
       return 'null';
@@ -75,11 +82,9 @@ export class JsonScript {
         return $fnToString.call(value);
       case 'symbol':
         return this._symbol(value);
+      case 'bigint':
+        return value.toString();
       case 'object':
-        if (this.exists.has(value)) {
-          throw new TypeError('cyclic object value');
-        }
-        this.exists.add(value);
       default:
         break;
     }
@@ -92,6 +97,12 @@ export class JsonScript {
       return value.toString();
     }
 
+    if (value instanceof Error) {
+      return `((e)=>{e.name=${$jsonStringify(value.name)};e.stack=${$jsonStringify(value.stack ?? '')}return e;})(new Error(${$jsonStringify(value.message)}))`;
+    }
+
+    this._cyclic(value);
+
     if (value instanceof Map) {
       return this._map(value, currentIndent);
     }
@@ -100,14 +111,14 @@ export class JsonScript {
       return this._set(value, currentIndent);
     }
 
-    if (Array.isArray(value)) {
+    if ($isArray(value)) {
       if (value.length === 0) {
         return '[]';
       }
 
-      const items = value.map((item) => this.stringify(item, nextIndent));
+      const items = value.map((item) => this._stringify(item, nextIndent));
 
-      if (!this.indent) {
+      if (!this._indent) {
         return `[${items.join(', ')}]`;
       }
 
@@ -123,11 +134,11 @@ export class JsonScript {
     const pairs = keys.map((key: string | symbol | number) => {
       const val = $get(value, key as any);
       const keyStr = typeof key === 'string' ? key : `[${this._symbol(key as symbol)}]`;
-      const valueStr = this.stringify(val, nextIndent);
+      const valueStr = this._stringify(val, nextIndent);
       return `${keyStr}: ${valueStr}`;
     });
 
-    if (!this.indent) {
+    if (!this._indent) {
       return `{${pairs.join(', ')}}`;
     }
 
@@ -141,12 +152,11 @@ export class JsonScript {
    * - distinguishes global symbols and local symbols
    * - will not preserve custom properties on Function, Date, RegExp, etc.
    * @param value The value to stringify
-   * @param currentIndent Current indentation level (internal use)
    * @returns String representation of the value
    */
-  stringify(value: unknown, currentIndent = ''): string {
-    const result = this._stringify(value, currentIndent);
-    this.exists.clear();
+  stringify(value: unknown): string {
+    const result = this._stringify(value);
+    this._exists.clear();
     return result;
   }
 
@@ -166,7 +176,8 @@ export class JsonScript {
    * @returns executed result of the code
    * @throws when code has syntax error or it's broken
    */
-  parse(code: string): any {
-    return Function(`"use strict"; ${code.replace(/[\s]+export default[\s]+/, 'return ')}`)();
+  parse<T extends any = any>(code: string): T {
+    const cleaned = code.replace(/[\s]+export default[\s]+/, '');
+    return Function(`"use strict"; return (${cleaned})`)();
   }
 }
