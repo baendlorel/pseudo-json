@@ -1,28 +1,15 @@
+import { $get, $ownKeys, $stringifySymbol } from './lib/common.js';
+
 /**
  * JsonScript - A creative class for stringifying JavaScript values to their literal representation
  * Preserves special values like NaN, undefined, Infinity, Symbol, etc.
  */
 export class JsonScript {
-  private readonly indentStr: string;
+  private readonly indent: string;
 
   constructor(options: { indent?: string | number } = {}) {
-    this.indentStr =
+    this.indent =
       typeof options.indent === 'number' ? ' '.repeat(options.indent) : options.indent || '';
-  }
-
-  /**
-   * Convert a symbol to its string representation
-   */
-  private stringifySymbol(value: symbol): string {
-    if (Symbol.keyFor(value)) {
-      if (value.description === undefined) {
-        return 'Symbol()';
-      } else {
-        return `Symbol(${JSON.stringify(value.description)})`;
-      }
-    } else {
-      return `Symbol.for(${JSON.stringify(value.description)})`;
-    }
   }
 
   /**
@@ -32,7 +19,7 @@ export class JsonScript {
    * @returns String representation of the value
    */
   stringify(value: unknown, currentIndent = ''): string {
-    const nextIndent = currentIndent + this.indentStr;
+    const nextIndent = currentIndent + this.indent;
 
     // Handle primitives and special values
     if (value === null) {
@@ -61,7 +48,7 @@ export class JsonScript {
       case 'function':
         return value.toString();
       case 'symbol':
-        return this.stringifySymbol(value);
+        return $stringifySymbol(value as symbol);
       case 'object':
       default:
         break;
@@ -85,7 +72,7 @@ export class JsonScript {
 
       const items = value.map((item) => this.stringify(item, nextIndent));
 
-      if (!this.indentStr) {
+      if (!this.indent) {
         return `[${items.join(', ')}]`;
       }
 
@@ -93,20 +80,20 @@ export class JsonScript {
     }
 
     // Handle Objects
-    const keys = Reflect.ownKeys(value);
+    const keys = $ownKeys(value);
 
     if (keys.length === 0) {
       return '{}';
     }
 
-    const pairs = keys.map((key) => {
-      const val = Reflect.get(value, key);
-      const keyStr = typeof key === 'string' ? key : this.stringifySymbol(key);
+    const pairs = keys.map((key: string | symbol | number) => {
+      const val = $get(value, key as any);
+      const keyStr = typeof key === 'string' ? key : `[${$stringifySymbol(key as symbol)}]`;
       const valueStr = this.stringify(val, nextIndent);
       return `${keyStr}: ${valueStr}`;
     });
 
-    if (!this.indentStr) {
+    if (!this.indent) {
       return `{${pairs.join(', ')}}`;
     }
 
