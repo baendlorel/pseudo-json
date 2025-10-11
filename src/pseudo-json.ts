@@ -1,14 +1,14 @@
-import { $jsonStringify, $fnToString, $ownKeys, $get, $isArray } from './lib/native.js';
+import { $jsonStrfy, $fnToStr, $ownKeys, $get, $isArray, $isNaN } from './lib/native.js';
 
 /**
- * ## JSONScript
+ * ## PseudoJSON
  * A creative class for stringifying JavaScript values to their literal representation
  *
  * Preserves special values like `NaN`, `undefined`, `Infinity`, `Symbol`, etc.
  *
  * __PKG_INFO__
  */
-export class JSONScript {
+export class PseudoJSON {
   /** @internal */
   private readonly _indent: string;
   /** @internal */
@@ -43,13 +43,13 @@ export class JSONScript {
    */
   private _symbol(value: symbol): string {
     if (Symbol.keyFor(value)) {
-      return `Symbol.for(${JSON.stringify(value.description)})`;
+      return `Symbol.for(${$jsonStrfy(value.description)})`;
     }
 
     if (value.description === undefined) {
       return 'Symbol()';
     } else {
-      return `Symbol(${JSON.stringify(value.description)})`;
+      return `Symbol(${$jsonStrfy(value.description)})`;
     }
   }
 
@@ -74,9 +74,9 @@ export class JSONScript {
 
     switch (typeof value) {
       case 'string':
-        return $jsonStringify(value);
+        return $jsonStrfy(value);
       case 'number':
-        if (Number.isNaN(value)) {
+        if ($isNaN(value)) {
           return 'NaN';
         } else if (value === Infinity) {
           return 'Infinity';
@@ -89,7 +89,7 @@ export class JSONScript {
       case 'undefined':
         return 'undefined';
       case 'function':
-        return $fnToString.call(value);
+        return $fnToStr.call(value);
       case 'symbol':
         return this._symbol(value);
       case 'bigint':
@@ -108,7 +108,7 @@ export class JSONScript {
     }
 
     if (value instanceof Error) {
-      return `((e)=>{e.name=${$jsonStringify(value.name)};e.stack=${$jsonStringify(value.stack ?? '')}return e;})(new Error(${$jsonStringify(value.message)}))`;
+      return `((e)=>{e.name=${$jsonStrfy(value.name)};e.stack=${$jsonStrfy(value.stack ?? '')}return e;})(new Error(${$jsonStrfy(value.message)}))`;
     }
 
     this._cyclic(value);
@@ -189,6 +189,7 @@ export class JSONScript {
    * @param code code string
    * @returns executed result of the code
    * @throws when code has syntax error or it's broken
+   * @note This parser executes the code using the Function constructor and does NOT support `import` statements. Only pass trusted code and avoid module imports in the input.
    */
   parse<T extends any = any>(code: string): T {
     const cleaned = code.replace(/(\s)*(export default|module.exports)[\s]+/, '');

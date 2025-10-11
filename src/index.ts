@@ -1,1 +1,1 @@
-export * from './json-script.js';
+export * from './pseudo-json.js';

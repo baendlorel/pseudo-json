@@ -1,4 +1,4 @@
-# JSONScript 📝
+# PseudoJSON 📝
 
 [![npm version](https://img.shields.io/npm/v/json-script.svg)](https://www.npmjs.com/package/json-script)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -20,9 +20,9 @@ pnpm add json-script
 ## 🔥 Quick Start
 
 ```typescript
-import { JSONScript } from 'json-script';
+import { PseudoJSON } from 'json-script';
 
-const js = new JSONScript({ indent: 2 });
+const js = new PseudoJSON({ indent: 2 });
 
 // Stringify: JavaScript object → string
 const config = {
@@ -47,12 +47,12 @@ const parsed = js.parse(code);
 
 ## 📖 API
 
-### `new JSONScript(options?)`
+### `new PseudoJSON(options?)`
 
 Create a new instance with optional formatting.
 
 ```typescript
-const js = new JSONScript({
+const js = new PseudoJSON({
   indent: 2, // number or string, default: no indent
 });
 ```
@@ -80,6 +80,8 @@ js.parse('{ a: 1, b: NaN }');
 js.parse('new Map([["key", "value"]])');
 // → Map { 'key' => 'value' }
 ```
+
+> Note: `parse` executes the input via the Function constructor and does NOT support `import` statements. Only pass trusted code and avoid module imports in strings you feed to `parse`.
 
 ### `generateExportModule(data: unknown): string`
 

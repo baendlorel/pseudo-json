@@ -1,38 +1,38 @@
 import { describe, it, expect } from 'vitest';
-import { JSONScript } from '../src/json-script.js';
+import { PseudoJSON } from '../src/pseudo-json.js';
 
-describe('JSONScript helper methods', () => {
+describe('PseudoJSON helper methods', () => {
   describe('_symbol helper (via stringify)', () => {
     it('should handle Symbol without description', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const sym = Symbol();
       const result = js.stringify(sym);
       expect(result).toBe('Symbol()');
     });
 
     it('should handle Symbol with string description', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const sym = Symbol('test');
       const result = js.stringify(sym);
       expect(result).toBe('Symbol("test")');
     });
 
     it('should handle Symbol with empty string description', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const sym = Symbol('');
       const result = js.stringify(sym);
       expect(result).toBe('Symbol("")');
     });
 
     it('should handle global Symbol', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const sym = Symbol.for('globalKey');
       const result = js.stringify(sym);
       expect(result).toBe('Symbol.for("globalKey")');
     });
 
     it('should handle Symbol with special characters in description', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const sym = Symbol('test\n"quote"');
       const result = js.stringify(sym);
       expect(result).toContain('Symbol');
@@ -41,7 +41,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should distinguish local vs global symbols with same description', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const local = Symbol('key');
       const global = Symbol.for('key');
       expect(js.stringify(local)).toBe('Symbol("key")');
@@ -49,7 +49,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Symbol as object key', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const sym = Symbol('key');
       const obj = { [sym]: 'value' };
       const result = js.stringify(obj);
@@ -57,7 +57,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle multiple Symbol keys in object', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const sym1 = Symbol('first');
       const sym2 = Symbol('second');
       const obj = { [sym1]: 1, [sym2]: 2 };
@@ -67,7 +67,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle global Symbol as object key', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const sym = Symbol.for('globalKey');
       const obj = { [sym]: 'value' };
       const result = js.stringify(obj);
@@ -77,26 +77,26 @@ describe('JSONScript helper methods', () => {
 
   describe('_set helper (via stringify)', () => {
     it('should handle empty Set', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const set = new Set();
       expect(js.stringify(set)).toBe('new Set([])');
     });
 
     it('should handle Set with single element', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const set = new Set([42]);
       expect(js.stringify(set)).toBe('new Set([42])');
     });
 
     it('should handle Set with multiple elements', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const set = new Set([1, 2, 3]);
       const result = js.stringify(set);
       expect(result).toBe('new Set([1, 2, 3])');
     });
 
     it('should handle Set with strings', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const set = new Set(['a', 'b', 'c']);
       const result = js.stringify(set);
       expect(result).toContain('new Set([');
@@ -106,7 +106,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Set with mixed types', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const set = new Set([1, 'hello', true, null, undefined]);
       const result = js.stringify(set);
       expect(result).toContain('1');
@@ -117,7 +117,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Set with special values', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const set = new Set([NaN, Infinity, -Infinity]);
       const result = js.stringify(set);
       expect(result).toContain('NaN');
@@ -126,7 +126,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Set with objects', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const set = new Set([{ a: 1 }, { b: 2 }]);
       const result = js.stringify(set);
       expect(result).toContain('{a: 1}');
@@ -134,7 +134,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Set with nested arrays', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const set = new Set([
         [1, 2],
         [3, 4],
@@ -145,7 +145,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Set with Date objects', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const date = new Date(1728000000000);
       const set = new Set([date]);
       const result = js.stringify(set);
@@ -153,14 +153,14 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle nested Set in object', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const obj = { mySet: new Set([1, 2, 3]) };
       const result = js.stringify(obj);
       expect(result).toContain('mySet: new Set([1, 2, 3])');
     });
 
     it('should preserve Set order (insertion order)', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const set = new Set([3, 1, 2]);
       const result = js.stringify(set);
       // Sets preserve insertion order
@@ -170,19 +170,19 @@ describe('JSONScript helper methods', () => {
 
   describe('_map helper (via stringify)', () => {
     it('should handle empty Map', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const map = new Map();
       expect(js.stringify(map)).toBe('new Map([])');
     });
 
     it('should handle Map with single entry', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const map = new Map([['key', 'value']]);
       expect(js.stringify(map)).toBe('new Map([["key", "value"]])');
     });
 
     it('should handle Map with multiple entries', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const map = new Map<string, number>([
         ['a', 1],
         ['b', 2],
@@ -195,7 +195,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Map with number keys', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const map = new Map<number, string>([
         [1, 'one'],
         [2, 'two'],
@@ -206,7 +206,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Map with Symbol keys', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const sym = Symbol('key');
       const map = new Map([[sym, 'value']]);
       const result = js.stringify(map);
@@ -215,7 +215,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Map with object keys', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const key = { id: 1 };
       const map = new Map([[key, 'value']]);
       const result = js.stringify(map);
@@ -224,7 +224,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Map with object values', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const map = new Map([
         ['key1', { a: 1 }],
         ['key2', { b: 2 }],
@@ -235,7 +235,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Map with array values', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const map = new Map([
         ['nums', [1, 2, 3]],
         ['strs', ['a', 'b']],
@@ -246,7 +246,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Map with special values', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const map = new Map([
         ['nan', NaN],
         ['inf', Infinity],
@@ -261,7 +261,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle nested Map in object', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const obj = {
         myMap: new Map([
           ['a', 1],
@@ -275,14 +275,14 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Map nested in Array', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const arr = [new Map([['key', 'value']])];
       const result = js.stringify(arr);
       expect(result).toContain('new Map([["key", "value"]])');
     });
 
     it('should preserve Map insertion order', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const map = new Map<string, number>([
         ['z', 3],
         ['a', 1],
@@ -298,7 +298,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Map with Date values', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const date = new Date(1728000000000);
       const map = new Map([['date', date]]);
       const result = js.stringify(map);
@@ -306,7 +306,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle Map with RegExp values', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const map = new Map([['pattern', /test/gi]]);
       const result = js.stringify(map);
       expect(result).toContain('["pattern", /test/gi]');
@@ -315,7 +315,7 @@ describe('JSONScript helper methods', () => {
 
   describe('cyclic reference detection (via exists Set)', () => {
     it('should detect direct self-reference in object', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const obj: any = {};
       obj.self = obj;
       expect(() => js.stringify(obj)).toThrow(TypeError);
@@ -323,21 +323,21 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should detect cyclic reference in nested objects', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const parent: any = { child: {} };
       parent.child.parent = parent;
       expect(() => js.stringify(parent)).toThrow(TypeError);
     });
 
     it('should detect cyclic reference in arrays', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const arr: any[] = [1, 2];
       arr.push(arr);
       expect(() => js.stringify(arr)).toThrow(TypeError);
     });
 
     it('should detect cyclic reference through Map', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const obj: any = {};
       const map = new Map([['ref', obj]]);
       obj.map = map;
@@ -345,7 +345,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should detect cyclic reference through Set', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const obj: any = {};
       const set = new Set([obj]);
       obj.set = set;
@@ -353,7 +353,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should reset exists Set after successful stringify', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const obj = { a: 1 };
       js.stringify(obj);
       // Second call should work fine (exists should be cleared)
@@ -361,7 +361,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should reset exists Set even after error', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const cyclic: any = {};
       cyclic.self = cyclic;
       try {
@@ -376,7 +376,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should allow same object at different positions (DAG structure)', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       const shared = { value: 42 };
       const obj = { a: shared, b: shared };
       // This will actually throw with current implementation
@@ -385,7 +385,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should not detect cycles in primitives', () => {
-      const js = new JSONScript();
+      const js = new PseudoJSON();
       expect(() => js.stringify([1, 1, 1])).not.toThrow();
       expect(() => js.stringify({ a: 'same', b: 'same' })).not.toThrow();
     });
@@ -393,7 +393,7 @@ describe('JSONScript helper methods', () => {
 
   describe('indent handling', () => {
     it('should use string indent in nested structures', () => {
-      const js = new JSONScript({ indent: '  ' });
+      const js = new PseudoJSON({ indent: '  ' });
       const obj = { a: { b: 1 } };
       const result = js.stringify(obj);
       expect(result).toContain('\n  ');
@@ -401,7 +401,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should use numeric indent in nested structures', () => {
-      const js = new JSONScript({ indent: 4 });
+      const js = new PseudoJSON({ indent: 4 });
       const obj = { a: { b: 1 } };
       const result = js.stringify(obj);
       expect(result).toContain('\n    ');
@@ -409,14 +409,14 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should handle tab indent', () => {
-      const js = new JSONScript({ indent: '\t' });
+      const js = new PseudoJSON({ indent: '\t' });
       const obj = { a: 1 };
       const result = js.stringify(obj);
       expect(result).toContain('\n\t');
     });
 
     it('should not indent when indent is empty string', () => {
-      const js = new JSONScript({ indent: '' });
+      const js = new PseudoJSON({ indent: '' });
       const obj = { a: 1 };
       const result = js.stringify(obj);
       expect(result).not.toContain('\n');
@@ -424,7 +424,7 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should not indent when indent is zero', () => {
-      const js = new JSONScript({ indent: 0 });
+      const js = new PseudoJSON({ indent: 0 });
       const obj = { a: 1 };
       const result = js.stringify(obj);
       expect(result).not.toContain('\n');
@@ -432,14 +432,14 @@ describe('JSONScript helper methods', () => {
     });
 
     it('should apply indent to arrays', () => {
-      const js = new JSONScript({ indent: 2 });
+      const js = new PseudoJSON({ indent: 2 });
       const arr = [1, 2];
       const result = js.stringify(arr);
       expect(result).toBe('[\n  1,\n  2\n]');
     });
 
     it('should apply indent to Map and Set (currently not implemented)', () => {
-      const js = new JSONScript({ indent: 2 });
+      const js = new PseudoJSON({ indent: 2 });
       // Current implementation doesn't indent Map/Set
       const map = new Map([['a', 1]]);
       const result = js.stringify(map);
