@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { JSONScript } from '../src/json-script.js';
 
-describe('JsonScript helper methods', () => {
+describe('JSONScript helper methods', () => {
   describe('_symbol helper (via stringify)', () => {
     it('should handle Symbol without description', () => {
       const js = new JSONScript();

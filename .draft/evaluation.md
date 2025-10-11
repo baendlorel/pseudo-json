@@ -1,8 +1,8 @@
-# JsonScript 代码评估报告
+# JSONScript 代码评估报告
 
 ## 总体评价
 
-`JsonScript` 类的设计整体清晰，功能完整，代码结构合理。通过 `native.ts` 抽离了底层 API 引用，有利于维护和潜在的 polyfill 替换。
+`JSONScript` 类的设计整体清晰，功能完整，代码结构合理。通过 `native.ts` 抽离了底层 API 引用，有利于维护和潜在的 polyfill 替换。
 
 ---
 

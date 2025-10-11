@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { JSONScript } from '../src/json-script.js';
 
-describe('JsonScript.parse', () => {
+describe('JSONScript.parse', () => {
   describe('primitive types', () => {
     it('should parse null', () => {
       const js = new JSONScript();

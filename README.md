@@ -1,5 +1,113 @@
-## <name>
+# JSONScript 📝
 
-[![npm version](https://img.shields.io/npm/v/<name>.svg)](https://www.npmjs.com/package/<name>) [![npm downloads](http://img.shields.io/npm/dm/<name>.svg)](https://npmcharts.com/compare/<name>,token-types?start=1200&interval=30)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/59dd6795e61949fb97066ca52e6097ef)](https://www.codacy.com/app/Borewit/<name>?utm_source=github.com&utm_medium=referral&utm_content=Borewit/<name>&utm_campaign=Badge_Grade)
-For more awesome packages, check out [my homepage💛](https://baendlorel.github.io/?repoType=npm)
+[![npm version](https://img.shields.io/npm/v/json-script.svg)](https://www.npmjs.com/package/json-script)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+🚀 Write more flexible configuration files with JavaScript syntax. Synchronously load configs without `import()`.
+
+JSON is too simple and restrictive. **json-script** lets you serialize and parse JavaScript objects exactly as they appear in JS files—with support for `Symbol`, `Map`, `Set`, `Date`, `RegExp`, `NaN`, `Infinity`, and more.
+
+For more awesome packages, check out [my homepage 💛](https://baendlorel.github.io/?repoType=npm)
+
+## 📦 Installation
+
+```bash
+npm install json-script
+# or
+pnpm add json-script
+```
+
+## 🔥 Quick Start
+
+```typescript
+import { JSONScript } from 'json-script';
+
+const js = new JSONScript({ indent: 2 });
+
+// Stringify: JavaScript object → string
+const config = {
+  name: 'my-app',
+  version: '1.0.0',
+  timeout: Infinity,
+  retries: NaN,
+  createdAt: new Date(),
+  pattern: /\.ts$/,
+  secret: Symbol('api-key'),
+  cache: new Map([['key', 'value']]),
+  tags: new Set(['prod', 'v1']),
+};
+
+const code = js.stringify(config);
+// Output: JavaScript literal syntax, not JSON!
+
+// Parse: string → JavaScript object
+const parsed = js.parse(code);
+// All types preserved! Map is Map, Date is Date, Symbol is Symbol
+```
+
+## 📖 API
+
+### `new JSONScript(options?)`
+
+Create a new instance with optional formatting.
+
+```typescript
+const js = new JSONScript({
+  indent: 2, // number or string, default: no indent
+});
+```
+
+### `stringify(value: unknown): string`
+
+Convert a JavaScript value to its literal string representation.
+
+```typescript
+js.stringify({ a: 1, b: NaN });
+// → "{a: 1, b: NaN}"
+
+js.stringify([1, 2, Symbol('key')]);
+// → "[1, 2, Symbol(\"key\")]"
+```
+
+### `parse(code: string): any`
+
+Parse a string back into a JavaScript value.
+
+```typescript
+js.parse('{ a: 1, b: NaN }');
+// → { a: 1, b: NaN }
+
+js.parse('new Map([["key", "value"]])');
+// → Map { 'key' => 'value' }
+```
+
+### `generateExportModule(data: unknown): string`
+
+Generate a complete ES module with `export default`.
+
+```typescript
+js.generateExportModule({ config: 'value' });
+// → "export default {config: \"value\"}\n"
+```
+
+## ⚠️ Limitations
+
+**⚠️ Simple Use Cases Only**: This library is designed for **configuration files and simple data structures**.
+
+**🚫 Not Recommended**:
+
+- ❌ Objects with circular references (will cause stack overflow)
+- ❌ Deeply nested structures (performance may degrade)
+- ❌ Untrusted input (parse something not exported by this library)
+- ❌ DAG structures (same object referenced multiple times)
+
+**✅ Best For**:
+
+- ✅ Configuration files
+- ✅ Static data with rich types
+- ✅ Small to medium-sized objects
+- ✅ Trusted input only
+
+## 📄 License
+
+MIT © [Kasukabe Tsumugi](https://github.com/baendlorel)
