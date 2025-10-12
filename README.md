@@ -1,26 +1,26 @@
 # PseudoJSON 📝
 
-[![npm version](https://img.shields.io/npm/v/json-script.svg)](https://www.npmjs.com/package/json-script)
+[![npm version](https://img.shields.io/npm/v/pseudo-json.svg)](https://www.npmjs.com/package/pseudo-json)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 🚀 Write more flexible configuration files with JavaScript syntax. Synchronously load configs without `import()`.
 
-JSON is too simple and restrictive. **json-script** lets you serialize and parse JavaScript objects exactly as they appear in JS files—with support for `Symbol`, `Map`, `Set`, `Date`, `RegExp`, `NaN`, `Infinity`, and more.
+JSON is too simple and restrictive. **pseudo-json** lets you serialize and parse JavaScript objects exactly as they appear in JS files—with support for `Symbol`, `Map`, `Set`, `Date`, `RegExp`, `NaN`, `Infinity`, and more.
 
 For more awesome packages, check out [my homepage 💛](https://baendlorel.github.io/?repoType=npm)
 
 ## 📦 Installation
 
 ```bash
-npm install json-script
+npm install pseudo-json
 # or
-pnpm add json-script
+pnpm add pseudo-json
 ```
 
 ## 🔥 Quick Start
 
 ```typescript
-import { PseudoJSON } from 'json-script';
+import { PseudoJSON } from 'pseudo-json';
 
 const js = new PseudoJSON({ indent: 2 });
 
