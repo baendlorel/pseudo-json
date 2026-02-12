@@ -9,3 +9,10 @@
 
 - parseJsonc(content: string)，返回值为类型体操，要求接收一个interface，将其改造为每个字段都是value、comments的形式
 - parseJS，也就是原来的那种情况
+
+---
+
+parse优化：
+1、因为代码可能有逻辑部分，因此，首先要将代码分成两部分：上半部分是逻辑代码，下半部分是导出对象的代码。2、先把代码按行拆分，然后，必须是行首+可选的空格后，正则匹配到export default或者module.exports，并将它们作为分界线。
+3、export default或者module.exports改为return，然后将全部代码join换行符起来，存入变量`code`中；
+4、将code放入new Function的入参中，创建并执行函数，返回值即为解析结果
