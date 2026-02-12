@@ -190,6 +190,7 @@ export class PseudoJSON {
    * - `Error`: preserve `name` and `stack`.
    * - `Map`/`Set`: preserve entries, and entries are also stringified.
    * - `Date`: only preserve the evaluated date value. So it won't give `new Date()` but `new Date(1700929823)`
+   * - Only serializes the current value; it cannot preserve runtime computation logic.
    *
    * @param value The value to stringify
    * @returns String representation of the value

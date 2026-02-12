@@ -63,6 +63,8 @@ const js = new PseudoJSON({
 
 Convert a JavaScript value to its literal string representation.
 
+Note: `stringify` only captures the current value and cannot preserve runtime computation logic.
+
 ```typescript
 js.stringify({ a: 1, b: NaN });
 // → "{a: 1, b: NaN}"
