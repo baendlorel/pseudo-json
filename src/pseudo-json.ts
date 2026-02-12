@@ -232,6 +232,7 @@ export class PseudoJSON {
    * @note This parser executes the code using the Function constructor and does NOT support `import` statements. Only pass trusted code and avoid module imports in the input.
    */
   parse<T extends any = any>(code: string): T {
+    // todo 这里要改成匹配行首，因为可能会有上半部分有代码的情况
     const cleaned = code.replace(/^\s*(?:export\s+default|module\s*\.\s*exports)\s*(?:=\s*)?/, '');
     return Function(`"use strict"; return (${cleaned})`)();
   }
