@@ -5,6 +5,8 @@
 
 🚀 Write more flexible configuration files with JavaScript syntax. Synchronously load configs without `import()`.
 
+This library is better suited for Node.js usage, especially when you want to load configs synchronously.
+
 JSON is too simple and restrictive. **pseudo-json** lets you serialize and parse JavaScript objects exactly as they appear in JS files—with support for `Symbol`, `Map`, `Set`, `Date`, `RegExp`, `NaN`, `Infinity`, and more.
 
 For more awesome packages, check out [my homepage 💛](https://baendlorel.github.io/?repoType=npm)

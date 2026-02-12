@@ -1,5 +1,31 @@
 import { $jsonStrfy, $fnToStr, $ownKeys, $get, $isArray, $isNaN } from './lib/native.js';
 
+interface GenerateModuleOptions {
+  /**
+   * Module type to generate, either 'esm' for ES Modules or 'cjs' for CommonJS. Default is 'esm'.
+   * - 'esm': generates `export default something`
+   * - 'cjs': generates `module.exports = something`
+   * @default 'esm'
+   */
+  type?: 'esm' | 'cjs';
+
+  /**
+   * Additional code to include above the export statement, such as imports or helper functions. This code will be included as-is and should be valid JavaScript.
+   * @example
+   * ```js
+   * const pseudoJson = new PseudoJSON();
+   * const moduleCode = pseudoJson.generateExportModule({ a: getNumber() }, {
+   *   codeAboveExport: 'import { getNumber } from "./helper.js";'
+   * });
+   * console.log(moduleCode);
+   * // Output:
+   * // import { helper } from "./helper.js";
+   * // export default { a: 1 }
+   * ```
+   */
+  codeAboveExport?: string;
+}
+
 /**
  * ## PseudoJSON
  * A creative class for stringifying JavaScript values to their literal representation
@@ -176,12 +202,26 @@ export class PseudoJSON {
 
   /**
    * Generate a complete JavaScript module string with export default
-   * @param data The data to export
+   * @param jsonCode The jsonCode to export
+   * @param options Options for module generation, including module type and additional code above export
    * @returns `export default something`
    */
-  generateExportModule(data: unknown): string {
-    const dataStr = this.stringify(data);
-    return `export default ${dataStr}\n`;
+  generateExportModule(jsonCode: unknown, options?: GenerateModuleOptions): string {
+    const moduleType = options?.type ?? 'esm';
+    const codeAboveExport = options?.codeAboveExport ? options.codeAboveExport : '';
+
+    if (typeof codeAboveExport !== 'string') {
+      throw new TypeError('codeAboveExport must be a string');
+    }
+
+    const dataStr = this.stringify(jsonCode);
+    if (moduleType === 'esm') {
+      return `export default ${dataStr}\n`;
+    } else if (moduleType === 'cjs') {
+      return `module.exports = ${dataStr}\n`;
+    } else {
+      throw new Error(`Unsupported module type: ${moduleType}`);
+    }
   }
 
   /**
@@ -192,7 +232,7 @@ export class PseudoJSON {
    * @note This parser executes the code using the Function constructor and does NOT support `import` statements. Only pass trusted code and avoid module imports in the input.
    */
   parse<T extends any = any>(code: string): T {
-    const cleaned = code.replace(/(\s)*(export default|module.exports)[\s]+/, '');
+    const cleaned = code.replace(/^\s*(?:export\s+default|module\s*\.\s*exports)\s*(?:=\s*)?/, '');
     return Function(`"use strict"; return (${cleaned})`)();
   }
 }
